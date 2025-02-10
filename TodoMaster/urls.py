@@ -17,12 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 
-def redirect_to_todos(request):
-    return redirect('todo_list')
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('todo_list')
+    return redirect('login')
 
 urlpatterns = [
-    path('', redirect_to_todos, name='home'),
+    path('', home, name='home'),
     path('todos/', include('todos.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 ]
