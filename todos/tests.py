@@ -28,6 +28,15 @@ class TodoViewTest(TestCase):
         self.assertTemplateUsed(response, 'todos/todo_list.html')
 
     def test_todo_create_view(self):
-        response = self.client.post('/todos/create/', {'title': 'New Todo', 'description': 'New Description'})
+        response = self.client.post('/todos/create/', {
+            'title': 'New Todo',
+            'description': 'New Description',
+            'priority': 'medium',
+            'category': 'Test',
+            'tags': 'test',
+        })
         self.assertEqual(response.status_code, 302)  # Redirect after creation
-        self.assertTrue(Todo.objects.filter(title='New Todo').exists())
+        todo = Todo.objects.filter(title='New Todo').first()
+        self.assertIsNotNone(todo)
+        self.assertEqual(todo.priority, 'medium')
+        self.assertEqual(todo.category, 'Test')
